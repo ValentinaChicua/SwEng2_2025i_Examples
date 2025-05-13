@@ -41,9 +41,9 @@ def get_user(user_id):
       404:
         description: User not found
     """
-    user = next((u for u in users if u["id"] == user_id), None)
+    user = [u for u in users if u["id"] == user_id]
     if user:
-        return jsonify(user)
+        return jsonify(user[0])
     return jsonify({"error": "User not found"}), 404
 
 @app.route('/users/<int:user_id>', methods=['PUT'])
@@ -80,10 +80,10 @@ def update_user(user_id):
           application/json: {"error": "User not found"}
     """
     data = request.get_json()
-    user = next((u for u in users if u["id"] == user_id), None)
+    user = [u for u in users if u["id"] == user_id]
     if user:
-        user["name"] = data["name"]
-        return jsonify(user)
+        user[0]["name"] = data["name"]
+        return jsonify(user[0])
     return jsonify({"error": "User not found"}), 404
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
@@ -108,7 +108,7 @@ def delete_user(user_id):
           application/json: {"error": "User not found"}
     """
     global users
-    user = next((u for u in users if u["id"] == user_id), None)
+    user = [u for u in users if u["id"] == user_id]
     if user:
         users = [u for u in users if u["id"] != user_id]
         return jsonify({"message": "User deleted"})
@@ -142,6 +142,54 @@ def create_user():
     new_user = {"id": len(users) + 1, "name": data["name"]}
     users.append(new_user)
     return jsonify(new_user), 201
+
+@app.route('/users/<int:user_id>', methods=['PATCH'])
+def patch_user(user_id):
+    """
+    Partially update a user by ID
+    ---
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: The ID of the user to update
+      - in: body
+        name: body
+        required: true
+        schema:
+          id: UserPatch
+          properties:
+            name:
+              type: string
+              description: New name of the user
+              example: Alice Updated
+    responses:
+      200:
+        description: User updated successfully
+        examples:
+          application/json: {"id": 1, "name": "Alice Updated"}
+      404:
+        description: User not found
+        examples:
+          application/json: {"error": "User not found"}
+      400:
+        description: Invalid input
+        examples:
+          application/json: {"error": "No update data provided"}
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No update data provided"}), 400
+        
+    user = [u for u in users if u["id"] == user_id]
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+        
+    if "name" in data:
+        user[0]["name"] = data["name"]
+        
+    return jsonify(user[0])
 
 if __name__ == '__main__':
     app.run(debug=True)
