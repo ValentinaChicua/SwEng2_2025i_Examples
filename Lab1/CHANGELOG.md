@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1] - 2025-05-13
+### Added
+- New `Authorization` header
+
+### Modified
+- Modify the authorization verification
+
 ## [1.2.0] - 2025-05-10
 ### Added
 - New `/users/search` endpoint
