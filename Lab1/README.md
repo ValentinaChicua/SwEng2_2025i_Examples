@@ -20,6 +20,7 @@ This is a simple RESTful API built with **Flask** and documented using **Swagger
 ```bash
 git clone https://github.com/camilonfs1/SwEng2_2025i.git
 cd SwEng2_2025i
+cd Lab1
 ```
 
 ### 2. Install dependencies
