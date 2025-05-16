@@ -10,7 +10,7 @@ This is a simple RESTful API built with **Flask** and documented using **Swagger
 - Get user by ID
 - Create a new user
 - Interactive API documentation via Swagger UI
-
+- Rate limited: You can make up to 5 API calls every 60 seconds.
 ---
 
 ## 🚀 Getting Started
