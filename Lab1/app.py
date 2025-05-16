@@ -2,13 +2,12 @@
 from flask import Flask, jsonify, request
 from flasgger import Swagger
 from functools import wraps
-
-
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 swagger = Swagger(app)
+
 limiter = Limiter(get_remote_address, app=app, default_limits=["5 per minute"])
 
 # Required header
@@ -254,11 +253,6 @@ def patch_user(user_id):
     if "name" in data:
         user[0]["name"] = data["name"]
         
-    return jsonify(user[0])
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
     return jsonify(user[0])
 
 if __name__ == '__main__':
