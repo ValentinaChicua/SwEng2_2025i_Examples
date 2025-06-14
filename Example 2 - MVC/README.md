@@ -30,7 +30,7 @@ todo_app/
 2. Run the application using Python 3:
 
 ```bash
-python main.py
+python FrontEnd-Test.py
 ```
 
 ---

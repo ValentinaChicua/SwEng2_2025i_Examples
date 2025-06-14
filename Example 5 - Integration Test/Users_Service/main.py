@@ -32,6 +32,11 @@ def get_user(user_id):
         return jsonify({'id': user.id, 'name': user.name})
     return jsonify({'error': 'User not found'}), 404
 
+@service_a.route('/users', methods=['GET'])
+def list_users():
+    users = User.query.all()
+    return jsonify([{'id': user.id, 'name': user.name} for user in users])
+
 if __name__ == '__main__':
     with service_a.app_context():
         db.create_all()

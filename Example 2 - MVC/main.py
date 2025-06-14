@@ -1,4 +1,4 @@
-# main.py
+# FrontEnd-Test.py
 
 from model import TaskModel
 from view import TaskView
