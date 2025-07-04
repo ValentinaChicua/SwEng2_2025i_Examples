@@ -102,6 +102,24 @@ HTML = '''
   </div>
 
   <div class="card">
+  <h2>🗑️ Eliminar Tarea</h2>
+  <label>ID de Tarea:</label>
+  <input id='delete-task-id' placeholder='Ej: 10'>
+  <label>ID de Usuario:</label>
+  <input id='delete-task-user-id' placeholder='Ej: 3'>
+  <button onclick='eliminarTarea()'>Eliminar Tarea</button>
+  <div id="delete-task-result" class="result"></div>
+</div>
+
+<div class="card">
+  <h2>❌ Eliminar Usuario</h2>
+  <label>ID de Usuario:</label>
+  <input id='delete-user-id' placeholder='Ej: 3'>
+  <button onclick='eliminarUsuario()'>Eliminar Usuario</button>
+  <div id="delete-user-result" class="result"></div>
+</div>
+
+  <div class="card">
     <h2>📋 Tareas</h2>
     <button onclick='verTareas()'>Actualizar lista de tareas</button>
     <ul id='tasks'></ul>
@@ -153,11 +171,70 @@ function verTareas() {
       ul.innerHTML = '';
       data.forEach(t => {
         let li = document.createElement('li');
-        li.innerText = `${t.title} (Usuario ID: ${t.user_id})`;
+        li.innerText = `${t.title} (ID: ${t.id}, Usuario ID: ${t.user_id})`;  // 👈 agrega el ID aquí
         ul.appendChild(li);
       });
     });
 }
+
+function eliminarTarea() {
+  const task_id = document.getElementById('delete-task-id').value;
+  const user_id = document.getElementById('delete-task-user-id').value;
+  const result = document.getElementById('delete-task-result');
+
+  fetch(`http://localhost:5002/tasks/${task_id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id })
+  })
+  .then(async res => {
+    const text = await res.text();
+    let data = {};
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      result.textContent = '❌ Respuesta inválida del servidor';
+      result.className = 'error';
+      return;
+    }
+
+    result.textContent = data.message || data.error || '❌ Error desconocido';
+    result.className = res.ok ? 'result' : 'error';
+  })
+  .catch(() => {
+    result.textContent = '❌ Error de red';
+    result.className = 'error';
+  });
+}
+
+
+
+
+
+function eliminarUsuario() {
+  const user_id = document.getElementById('delete-user-id').value;
+
+  fetch(`http://localhost:5001/users/${user_id}`, {
+    method: 'DELETE'
+  })
+  .then(res => {
+    const result = document.getElementById('delete-user-result');
+    if (res.status === 200) {
+      result.textContent = `✅ Usuario con ID ${user_id} eliminado correctamente`;
+      result.className = 'result';
+    } else if (res.status === 404) {
+      result.textContent = `❌ Usuario con ID ${user_id} no encontrado`;
+      result.className = 'error';
+    } else {
+      result.textContent = `❌ Error al eliminar el usuario`;
+      result.className = 'error';
+    }
+  }).catch(err => {
+    document.getElementById('delete-user-result').textContent = `❌ Error de red`;
+    document.getElementById('delete-user-result').className = 'error';
+  });
+}
+
 </script>
 </body>
 </html>
