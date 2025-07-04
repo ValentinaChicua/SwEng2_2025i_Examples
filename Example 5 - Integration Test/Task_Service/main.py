@@ -38,6 +38,37 @@ def get_tasks():
     tasks = Task.query.all()
     return jsonify([{'id': t.id, 'title': t.title, 'user_id': t.user_id} for t in tasks])
 
+
+@service_b.route('/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    # Obtener los datos del cuerpo de la solicitud (user_id)
+    data = request.get_json()
+    if not data or not data.get('user_id'):
+        return jsonify({'error': 'Datos inválidos'}), 400
+
+    # Verificar que el usuario existe en el sistema
+    try:
+        user_check = requests.get(f'http://localhost:5001/users/{data["user_id"]}')
+    except Exception as e:
+        return jsonify({'error': f'Error de conexión al verificar usuario: {str(e)}'}), 500
+
+    if user_check.status_code != 200:
+        return jsonify({'error': 'ID de usuario inválido'}), 400
+
+    # Buscar la tarea por task_id y verificar que pertenece al usuario
+    task = Task.query.filter_by(id=task_id, user_id=data['user_id']).first()
+    
+    if not task:
+        return jsonify({'error': 'Tarea no encontrada o no pertenece al usuario'}), 404
+
+    # Eliminar la tarea
+    db.session.delete(task)
+    db.session.commit()
+
+    return jsonify({'message': f'Tarea con ID {task_id} eliminada exitosamente'}), 200
+
+
+
 if __name__ == '__main__':
     with service_b.app_context():
         db.create_all()
